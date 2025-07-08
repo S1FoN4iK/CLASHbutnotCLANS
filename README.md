@@ -31,13 +31,13 @@ git clone https://github.com/S1FoN4iK/CLASHbutnotCLANS
 cd CLASHbutnotCLANS
 ```
 **2. Создайте и активируйте виртуальное окружение:**
-# Для Windows
+Для Windows
 ```bash
 python -m venv venv
 venv\Scripts\activate
 ```
 
-# Для macOS/Linux
+Для macOS/Linux
 ```bash
 python3 -m venv venv
 source venv/bin/activate
