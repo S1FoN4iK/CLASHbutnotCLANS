@@ -1,0 +1,62 @@
+{% extends "clan_stats/base.html" %}
+
+{% block title %}Поиск клана{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h1 class="mb-4 text-center">Поиск статистики клана</h1>
+        <form id="search-form" method="post">
+            {% csrf_token %}
+            <div class="input-group mb-3">
+                <input type="text" name="clan_tag" class="form-control" placeholder="Введите тег клана, например: #2PP" required>
+                <button class="btn btn-primary" type="submit">Найти</button>
+            </div>
+        </form>
+        
+        <!-- Сюда будут загружаться результаты -->
+        <div id="results-container">
+            <!-- Индикатор загрузки -->
+            <div class="d-none text-center" id="loading-spinner">
+                <div class="spinner-border" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('search-form').addEventListener('submit', function(e) {
+        e.preventDefault(); // Отменяем стандартную отправку формы
+
+        const form = e.target;
+        const formData = new FormData(form);
+        const resultsContainer = document.getElementById('results-container');
+        const spinner = document.getElementById('loading-spinner');
+
+        resultsContainer.innerHTML = ''; // Очищаем старые результаты
+        spinner.classList.remove('d-none');
+
+        fetch("{% url 'search_clan_ajax' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            resultsContainer.innerHTML = html;
+        })
+        .catch(error => {
+            resultsContainer.innerHTML = `<div class="alert alert-danger">Сетевая ошибка: ${error}</div>`;
+        })
+        .finally(() => {
+            spinner.classList.add('d-none');
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,104 @@
+
+/* Основные цвета */
+:root {
+    --dark-bg: #1e1e1e;       /* Темный фон */
+    --primary-text: #f0f0f0;  /* Основной светлый текст */
+    --secondary-text: #a0a0a0;/* Второстепенный серый текст */
+    --accent-red: #e52525;    /* Яркий красный акцент */
+    --hover-red: #ff4040;     /* Красный при наведении */
+    --card-bg: #2a2a2a;       /* Фон карточек и таблиц */
+    --border-color: #444;     /* Цвет границ */
+}
+
+/* Общие стили для страницы */
+body {
+    background-color: var(--dark-bg);
+    color: var(--primary-text);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Заголовки */
+h1, h2, h3, h4, h5 {
+    color: var(--primary-text);
+}
+
+/* Ссылки */
+a {
+    color: var(--accent-red);
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+
+a:hover {
+    color: var(--hover-red);
+    text-decoration: none;
+}
+
+/* Карточки */
+.card {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+}
+
+.card-header, .card-footer {
+    background-color: #252525;
+    border-bottom: 1px solid var(--border-color);
+    border-top: 1px solid var(--border-color);
+}
+
+/* Таблицы */
+.table {
+    --bs-table-bg: var(--card-bg); /* фон таблицы */
+    --bs-table-color: var(--primary-text); /* цвет текста */
+    --bs-table-border-color: var(--border-color); /* цвет границ */
+    --bs-table-striped-bg: #333333; /* цвет для "зебры" */
+    --bs-table-hover-bg: #3c3c3c; /* цвет при наведении */
+}
+
+thead th {
+    color: var(--accent-red); /* Красные заголовки в таблице */
+}
+
+/* Формы */
+.form-control {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--primary-text);
+}
+
+.form-control:focus {
+    background-color: var(--card-bg);
+    border-color: var(--accent-red);
+    color: var(--primary-text);
+    box-shadow: 0 0 0 0.25rem rgba(229, 37, 37, 0.25);
+}
+
+/* Кнопки */
+.btn-primary {
+    background-color: var(--accent-red);
+    border-color: var(--accent-red);
+}
+
+.btn-primary:hover {
+    background-color: var(--hover-red);
+    border-color: var(--hover-red);
+}
+
+/* Спиннер загрузки */
+.spinner-border {
+    color: var(--accent-red);
+}
+
+.card-body {
+    color: var(--primary-text);
+}
+
+.form-control::placeholder {
+    color: var(--secondary-text);
+    opacity: 1; 
+}
+
+.list-group-item {
+    color: var(--primary-text);
+    border-color: var(--border-color) !important; 
+}
