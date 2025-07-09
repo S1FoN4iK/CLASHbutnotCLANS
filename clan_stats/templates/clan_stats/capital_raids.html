@@ -1,0 +1,44 @@
+{% extends "clan_stats/base.html" %}
+
+{% block title %}Рейды столицы{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">История рейдов столицы</h1>
+<a href="javascript:history.back()" class="btn btn-secondary mb-3">Назад к клану</a>
+
+{% for raid in raids_data.items %}
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between">
+        <span>Рейд закончился: {{ raid.endTime|date:"d.m.Y H:i" }}</span>
+        <span class="badge bg-success fs-6">Всего добыто: {{ raid.capitalTotalLoot }}</span>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-sm table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Игрок</th>
+                        <th>Кол-во атак</th>
+                        <th>Добыто ресурсов</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member in raid.members|dictsortreversed:"capitalResourcesLooted" %}
+                    <tr>
+                        <td>{{ member.name }}</td>
+                        <td>{{ member.attacks }}</td>
+                        <td>{{ member.capitalResourcesLooted }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3">Нет данных об участниках.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% empty %}
+<div class="alert alert-info">Нет данных о рейдах столицы.</div>
+{% endfor %}
+
+{% endblock %}

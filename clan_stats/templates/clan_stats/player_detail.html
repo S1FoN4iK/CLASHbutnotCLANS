@@ -14,57 +14,91 @@
         </h2>
     </div>
     <div class="card-body">
-        <div class="row">
-            <!-- Блок с основной информацией -->
-            <div class="col-md-6">
-                <h4>Общая информация</h4>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item bg-transparent"><strong>Клан:</strong> {{ api_data.clan.name }} ({{ api_data.clan.tag }})</li>
-                    <li class="list-group-item bg-transparent"><strong>Роль в клане:</strong> {{ api_data.role }}</li>
-                    <li class="list-group-item bg-transparent"><strong>Уровень Ратуши:</strong> {{ api_data.townHallLevel }}</li>
-                    <li class="list-group-item bg-transparent"><strong>Трофеи:</strong> {{ api_data.trophies }} (Рекорд: {{ api_data.bestTrophies }})</li>
-                    <li class="list-group-item bg-transparent"><strong>Звезды войны:</strong> {{ api_data.warStars }}</li>
-                    <li class="list-group-item bg-transparent"><strong>Донат за сезон:</strong> {{ api_data.donations }}/{{ api_data.donationsReceived }}</li>
-                </ul>
-            </div>
-            <!-- Блок с героями -->
-            <div class="col-md-6">
-                <h4>Герои</h4>
-                <ul class="list-group list-group-flush">
-                    {% for hero in api_data.heroes %}
-                        {% if hero.village == 'home' %}
-                        <li class="list-group-item bg-transparent">{{ hero.name }}: <strong>{{ hero.level }}</strong> уровень (макс. {{ hero.maxLevel }})</li>
+        <!-- Навигация по вкладкам -->
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="true">Профиль</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="achievements-tab" data-bs-toggle="tab" data-bs-target="#achievements-tab-pane" type="button" role="tab" aria-controls="achievements-tab-pane" aria-selected="false">Достижения</button>
+            </li>
+        </ul>
+
+        <!-- Содержимое вкладок -->
+        <div class="tab-content pt-3" id="myTabContent">
+            <!-- ВКЛАДКА "ПРОФИЛЬ" -->
+            <div class="tab-pane fade show active" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+                <div class="row mt-3">
+                    <!-- Блок с основной информацией -->
+                    <div class="col-md-6">
+                        <h4>Общая информация</h4>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item bg-transparent"><strong>Клан:</strong> {{ api_data.clan.name }} ({{ api_data.clan.tag }})</li>
+                            <li class="list-group-item bg-transparent"><strong>Роль в клане:</strong> {{ api_data.role }}</li>
+                            <li class="list-group-item bg-transparent"><strong>Уровень Ратуши:</strong> {{ api_data.townHallLevel }}</li>
+                            <li class="list-group-item bg-transparent"><strong>Трофеи:</strong> {{ api_data.trophies }} (Рекорд: {{ api_data.bestTrophies }})</li>
+                            <li class="list-group-item bg-transparent"><strong>Звезды войны:</strong> {{ api_data.warStars }}</li>
+                            <li class="list-group-item bg-transparent"><strong>Донат за сезон:</strong> {{ api_data.donations }}/{{ api_data.donationsReceived }}</li>
+                        </ul>
+                    </div>
+                    <!-- Блок с героями -->
+                    <div class="col-md-6">
+                        <h4>Герои</h4>
+                        <ul class="list-group list-group-flush">
+                            {% for hero in api_data.heroes %}
+                                {% if hero.village == 'home' %}
+                                <li class="list-group-item bg-transparent">{{ hero.name }}: <strong>{{ hero.level }}</strong> уровень (макс. {{ hero.maxLevel }})</li>
+                                {% endif %}
+                            {% empty %}
+                                <li class="list-group-item bg-transparent">Герои не найдены.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <hr class="my-4" style="border-color: var(--border-color);">
+
+                <!-- Блок с войсками и заклинаниями -->
+                <h4>Армия (Домашняя деревня)</h4>
+                
+                <h5>Войска</h5>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for unit in api_data.troops %}
+                        {% if unit.village == 'home' %}
+                        <div class="p-2 rounded" style="background-color: #333;">
+                            <strong>{{ unit.name }}</strong>: {{ unit.level }} <small class="text-muted">/{{ unit.maxLevel }}</small>
+                        </div>
                         {% endif %}
-                    {% empty %}
-                        <li class="list-group-item bg-transparent">Герои не найдены.</li>
                     {% endfor %}
-                </ul>
+                </div>
+
+                <h5 class="mt-4">Заклинания</h5>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for unit in api_data.spells %}
+                        <div class="p-2 rounded" style="background-color: #333;">
+                            <strong>{{ unit.name }}</strong>: {{ unit.level }} <small class="text-muted">/{{ unit.maxLevel }}</small>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
-        </div>
 
-        <hr class="my-4" style="border-color: var(--border-color);">
-
-        <!-- Блок с войсками и заклинаниями -->
-        <h4>Армия (Домашняя деревня)</h4>
-        
-        <h5>Войска</h5>
-        <div class="d-flex flex-wrap gap-2">
-            {% for unit in api_data.troops %}
-                {% if unit.village == 'home' and unit.name != 'Super Pekka' %}
-                <div class="p-2 rounded" style="background-color: #333;">
-                    <strong>{{ unit.name }}</strong>: {{ unit.level }} <small>/{{ unit.maxLevel }}</small>
+            <!-- ВКЛАДКА "ДОСТИЖЕНИЯ" -->
+            <div class="tab-pane fade" id="achievements-tab-pane" role="tabpanel" aria-labelledby="achievements-tab" tabindex="0">
+                <div class="row mt-3">
+                    {% for ach in api_data.achievements %}
+                    <div class="col-md-6 mb-3">
+                        <h6>{{ ach.name }} {% for i in ""|center:ach.stars %}⭐{% endfor %}</h6>
+                        <p class="mb-1 small text-muted">{{ ach.info }}</p>
+                        <div class="progress" style="height: 20px; background-color: #333;">
+                            {% widthratio ach.value ach.target 100 as progress_width %}
+                            <div class="progress-bar bg-danger" role="progressbar" style="width: {{ progress_width }}%;" aria-valuenow="{{ ach.value }}" aria-valuemin="0" aria-valuemax="{{ ach.target }}">
+                                {{ ach.value }} / {{ ach.target }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
-                {% endif %}
-            {% endfor %}
-        </div>
-
-        <h5 class="mt-4">Заклинания</h5>
-        <div class="d-flex flex-wrap gap-2">
-            {% for unit in api_data.spells %}
-                <div class="p-2 rounded" style="background-color: #333;">
-                    <strong>{{ unit.name }}</strong>: {{ unit.level }} <small>/{{ unit.maxLevel }}</small>
-                </div>
-            {% endfor %}
+            </div>
         </div>
     </div>
     <div class="card-footer text-end">

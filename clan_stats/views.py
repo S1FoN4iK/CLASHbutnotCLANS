@@ -65,7 +65,6 @@ def player_detail(request, player_tag):
 
         # Обновляем нашего игрока в БД
         # Используем get_object_or_404, чтобы убедиться, что игрок уже есть в БД
-        # (его создает предыдущий запрос к клану)
         player_instance = get_object_or_404(Player, tag=full_tag)
         
         # Извлекаем уровни героев (с проверкой на их наличие)
@@ -88,3 +87,52 @@ def player_detail(request, player_tag):
         
     except api_client.ApiError as e:
         return render(request, 'clan_stats/error_page.html', {'error': e})
+
+def current_clan_war(request, clan_tag):
+    full_tag = f"#{clan_tag}"
+    try:
+        war_data = api_client.get_current_war(full_tag)
+        context = {'war_data': war_data}
+        return render(request, 'clan_stats/current_war.html', context)
+    except api_client.ApiError as e:
+        return render(request, 'clan_stats/error_page.html', {'error': e})
+
+def clan_war_log(request, clan_tag):
+    full_tag = f"#{clan_tag}"
+    try:
+        war_log_data = api_client.get_war_log(full_tag)
+        context = {'war_log_data': war_log_data}
+        return render(request, 'clan_stats/war_log.html', context)
+    except api_client.ApiError as e:
+        return render(request, 'clan_stats/error_page.html', {'error': e})
+
+def capital_raids(request, clan_tag):
+    full_tag = f"#{clan_tag}"
+    try:
+        raids_data = api_client.get_capital_raids(full_tag)
+        context = {
+            'raids_data': raids_data,
+            'clan_tag': clan_tag # Передаем тег для кнопки "назад"
+        }
+        return render(request, 'clan_stats/capital_raids.html', context)
+    except api_client.ApiError as e:
+        return render(request, 'clan_stats/error_page.html', {'error': e})
+
+def rankings_list(request):
+    context = {}
+    try:
+        locations_data = api_client.get_locations()
+        # Оставляем только страны, убираем континенты
+        countries = [loc for loc in locations_data.get('items', []) if loc.get('isCountry')]
+        context['locations'] = countries
+        
+        location_id = request.GET.get('location_id')
+        if location_id:
+            rankings_data = api_client.get_clan_rankings(location_id)
+            context['rankings'] = rankings_data.get('items', [])
+            context['selected_location_id'] = int(location_id)
+
+    except api_client.ApiError as e:
+        context['error'] = e
+
+    return render(request, 'clan_stats/rankings.html', context)        

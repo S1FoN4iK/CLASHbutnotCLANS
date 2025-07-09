@@ -91,3 +91,119 @@ def get_player_data(player_tag: str):
         raise ApiError(f"Ошибка API: {e.response.text}", e.response.status_code)
     except requests.exceptions.RequestException as e:
         raise ApiError(f"Ошибка сети: {e}")
+
+def get_current_war(clan_tag: str):
+    """Получает информацию о текущей войне клана."""
+    if not clan_tag.startswith('#'):
+        clan_tag = f'#{clan_tag}'
+    
+    cache_key = f'current_war_{clan_tag}'
+    if cached_data := cache.get(cache_key):
+        return cached_data
+    
+    clan_tag_encoded = clan_tag.replace('#', '%23')
+    url = f'{API_BASE_URL}/clans/{clan_tag_encoded}/currentwar'
+    headers = {'Authorization': f'Bearer {API_TOKEN}'}
+    
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        # Войны меняются часто, кэшируем на 5 минут
+        cache.set(cache_key, data, 300) 
+        return data
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 404:
+            raise ApiError("Клан не найден или не участвует в войне.", 404)
+        raise ApiError(f"Ошибка API: {e.response.text}", e.response.status_code)
+    except requests.exceptions.RequestException as e:
+        raise ApiError(f"Ошибка сети: {e}")
+
+def get_war_log(clan_tag: str):
+    """Получает журнал войн клана."""
+    if not clan_tag.startswith('#'):
+        clan_tag = f'#{clan_tag}'
+
+    cache_key = f'war_log_{clan_tag}'
+    if cached_data := cache.get(cache_key):
+        return cached_data
+
+    clan_tag_encoded = clan_tag.replace('#', '%23')
+    url = f'{API_BASE_URL}/clans/{clan_tag_encoded}/warlog'
+    headers = {'Authorization': f'Bearer {API_TOKEN}'}
+    
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        # Журнал меняется редко, кэшируем на 30 минут
+        cache.set(cache_key, data, 1800)
+        return data
+    except requests.exceptions.HTTPError as e:
+        raise ApiError(f"Клан не найден.", 404)
+    except requests.exceptions.RequestException as e:
+        raise ApiError(f"Ошибка сети: {e}")
+
+def get_capital_raids(clan_tag: str):
+    """Получает журнал рейдов столицы клана."""
+    if not clan_tag.startswith('#'):
+        clan_tag = f'#{clan_tag}'
+
+    cache_key = f'capital_raids_{clan_tag}'
+    if cached_data := cache.get(cache_key):
+        return cached_data
+
+    clan_tag_encoded = clan_tag.replace('#', '%23')
+    # Добавляем ?limit=5, чтобы не грузить слишком много данных
+    url = f'{API_BASE_URL}/clans/{clan_tag_encoded}/capitalraidseasons?limit=5'
+    headers = {'Authorization': f'Bearer {API_TOKEN}'}
+    
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        # Кэшируем на 1 час
+        cache.set(cache_key, data, 3600)
+        return data
+    except requests.exceptions.HTTPError as e:
+        raise ApiError(f"Клан не найден.", 404)
+    except requests.exceptions.RequestException as e:
+        raise ApiError(f"Ошибка сети: {e}")
+
+def get_locations():
+    """Получает список всех доступных локаций (стран)."""
+    cache_key = 'locations_list'
+    if cached_data := cache.get(cache_key):
+        return cached_data
+
+    url = f'{API_BASE_URL}/locations'
+    headers = {'Authorization': f'Bearer {API_TOKEN}'}
+    
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        # Кэшируем на 1 день, т.к. список стран не меняется
+        cache.set(cache_key, data, 86400)
+        return data
+    except (requests.exceptions.RequestException, requests.exceptions.HTTPError) as e:
+        raise ApiError(f"Ошибка получения списка локаций: {e}")
+
+def get_clan_rankings(location_id: int):
+    """Получает рейтинг кланов для указанной локации."""
+    cache_key = f'clan_ranking_{location_id}'
+    if cached_data := cache.get(cache_key):
+        return cached_data
+
+    url = f'{API_BASE_URL}/locations/{location_id}/rankings/clans'
+    headers = {'Authorization': f'Bearer {API_TOKEN}'}
+    
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        # Рейтинги меняются, кэшируем на 1 час
+        cache.set(cache_key, data, 3600)
+        return data
+    except (requests.exceptions.RequestException, requests.exceptions.HTTPError) as e:
+        raise ApiError(f"Ошибка получения рейтинга: {e}")        

@@ -1,0 +1,61 @@
+{% extends "clan_stats/base.html" %}
+
+{% block title %}Текущая война{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Текущая война</h1>
+<a href="javascript:history.back()" class="btn btn-secondary mb-3">Назад к клану</a>
+
+{% if war_data.state == 'inWar' or war_data.state == 'warEnded' %}
+    <div class="row">
+        <!-- НАШ КЛАН -->
+        <div class="col-lg-6">
+            {% with team=war_data.clan %}
+            <div class="card mb-3">
+                <div class="card-header"><h3><img src="{{ team.badgeUrls.medium }}" height="40px"> {{ team.name }} ({{ team.stars }} ★)</h3></div>
+                <ul class="list-group list-group-flush">
+                    {% for member in team.members %}
+                    <li class="list-group-item">
+                        <strong>{{ member.mapPosition }}. {{ member.name }}</strong> (ТХ {{ member.townhallLevel }})
+                        <div class="ps-3">
+                            {% for attack in member.attacks %}
+                                <small>Атака на #{{ attack.defenderTag|slice:'1:' }} -> {{ attack.stars }}⭐ {{ attack.destructionPercentage }}%</small><br>
+                            {% empty %}
+                                <small class="text-muted">Атак не было</small>
+                            {% endfor %}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endwith %}
+        </div>
+        <!-- КЛАН-СОПЕРНИК -->
+        <div class="col-lg-6">
+            {% with team=war_data.opponent %}
+             <div class="card mb-3">
+                <div class="card-header"><h3><img src="{{ team.badgeUrls.medium }}" height="40px"> {{ team.name }} ({{ team.stars }} ★)</h3></div>
+                <ul class="list-group list-group-flush">
+                    {% for member in team.members %}
+                    <li class="list-group-item">
+                        <strong>{{ member.mapPosition }}. {{ member.name }}</strong> (ТХ {{ member.townhallLevel }})
+                         <div class="ps-3">
+                            {% for attack in member.attacks %}
+                                <small>Атака на #{{ attack.defenderTag|slice:'1:' }} -> {{ attack.stars }}⭐ {{ attack.destructionPercentage }}%</small><br>
+                            {% empty %}
+                                 <small class="text-muted">Атак не было</small>
+                            {% endfor %}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endwith %}
+        </div>
+    </div>
+{% else %}
+    <div class="alert alert-info">
+        В данный момент клан не участвует в войне. Состояние: {{ war_data.state }}
+    </div>
+{% endif %}
+{% endblock %}

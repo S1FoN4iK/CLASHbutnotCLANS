@@ -1,0 +1,34 @@
+{% extends "clan_stats/base.html" %}
+
+{% block title %}Журнал войн{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">Журнал войн</h1>
+<a href="javascript:history.back()" class="btn btn-secondary mb-3">Назад к клану</a>
+
+<div class="list-group">
+    {% for war in war_log_data.items %}
+        <div class="list-group-item list-group-item-action flex-column align-items-start" style="background-color: var(--card-bg); border-color: var(--border-color);">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">
+                    {% if war.result == 'win' %}
+                        <span class="text-success">Победа</span>
+                    {% elif war.result == 'lose' %}
+                        <span class="text-danger">Поражение</span>
+                    {% else %}
+                        <span class="text-warning">Ничья</span>
+                    {% endif %}
+                    vs {{ war.opponent.name }}
+                </h5>
+                <small>{{ war.endTime|date:"d.m.Y H:i" }}</small>
+            </div>
+            <p class="mb-1">
+                <img src="{{ war.clan.badgeUrls.small }}" alt=""> {{ war.clan.stars }} ★ vs {{ war.opponent.stars }} ★ <img src="{{ war.opponent.badgeUrls.small }}" alt="">
+            </p>
+            <small>Размер команды: {{ war.teamSize }} на {{ war.teamSize }}. Разрушение: {{ war.clan.destructionPercentage|floatformat:2 }}%</small>
+        </div>
+    {% empty %}
+        <p>Журнал войн пуст или недоступен.</p>
+    {% endfor %}
+</div>
+{% endblock %}
